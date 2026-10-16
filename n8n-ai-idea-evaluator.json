@@ -1,0 +1,143 @@
+{
+  "name": "My workflow",
+  "nodes": [
+    {
+      "parameters": {
+        "updates": [
+          "message"
+        ],
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegramTrigger",
+      "typeVersion": 1.5,
+      "position": [
+        0,
+        0
+      ],
+      "id": "53eb1855-50b1-4235-b32d-6e47dbf68d5d",
+      "name": "Telegram Trigger",
+      "webhookId": "a5e3e886-2415-488f-8fb7-f34ba0c49d90",
+      "credentials": {
+        "telegramApi": {
+          "id": "Xp0lZgEmcnm0jdge",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=   {{ $json.message.text }}",
+        "messages": {
+          "messageValues": [
+            {
+              "message": "You are a business consultant. The user sends you a business or product idea. Analyze it and always answer in exactly this format, without Markdown special characters such as * or #:  IDEA: (one-line summary)  FEASIBILITY: X/10 (2 sentences of reasoning)  BENEFIT: X/10 (2 sentences of reasoning)  SWOT Strengths: (3 bullet points) Weaknesses: (3 bullet points) Opportunities: (3 bullet points) Threats: (3 bullet points)  OVERALL SCORE: X/10 (1 sentence conclusion)  Always answer in English, even if the user writes in another language. Keep it short and factual. If the message does not contain an idea, ask the user to describe one."
+            }
+          ]
+        },
+        "batching": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.9,
+      "position": [
+        224,
+        0
+      ],
+      "id": "029d5bcb-26d7-44c9-984c-9bf89ec6319b",
+      "name": "Basic LLM Chain"
+    },
+    {
+      "parameters": {
+        "model": "gemma4:12b",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOllama",
+      "typeVersion": 1,
+      "position": [
+        272,
+        208
+      ],
+      "id": "c4e0d393-f84e-48d8-96b9-4f391c383984",
+      "name": "Ollama Chat Model",
+      "credentials": {
+        "ollamaApi": {
+          "id": "cGGSPzZilloi1Ann",
+          "name": "Ollama account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Telegram Trigger').first().json.message.chat.id }}",
+        "text": "=   {{ $json.text }}",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        544,
+        0
+      ],
+      "id": "08ee64f0-d491-4b57-ac82-b7c3a1eb28ff",
+      "name": "Send a text message",
+      "webhookId": "36f9e25e-615d-407c-b32d-04bb3466e087",
+      "credentials": {
+        "telegramApi": {
+          "id": "Xp0lZgEmcnm0jdge",
+          "name": "Telegram account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Telegram Trigger": {
+      "main": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ollama Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Basic LLM Chain": {
+      "main": [
+        [
+          {
+            "node": "Send a text message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "66407d1c-2628-4e33-9dc1-4c2fbf980ebd",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "4fcbe06ae99d1c5bf08455c1f32fe45d2ae8676535e1d2d69e9be3fbdd8df3a1"
+  },
+  "nodeGroups": [],
+  "id": "6WcI1Q7ii711yVCI",
+  "tags": []
+}
